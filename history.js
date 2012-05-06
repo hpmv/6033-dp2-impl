@@ -15,7 +15,12 @@ var History = function () {
   };
   this.addEdge = function (parentRev, childRev, data, color) {
     var edge = new Edge(parentRev, childRev, data, color);
-    this.parents[childRev].push(parentRev);
+    var parents = this.parents[childRev];
+    for(var i=0;i<parents.length;i++){
+      if(parents[i] == parentRev)
+        return;
+    }
+    parents.push(parentRev);
     this.children[parentRev].push(edge);
   };
   this.removeEdge = function (parentRev, childRev) {
@@ -107,6 +112,17 @@ var History = function () {
     }
     throw "No LCA found. rev1: " + rev1 + ", rev2: " + rev2;
   };
+  this.toPortable = function() {
+    var revisions = this.revisions.all();
+    var edges = [];
+    for(var rev in this.children) {
+      edges = edges.concat(this.children[rev]);
+    }
+    return {
+      revisions: revisions,
+      edges: edges
+    };
+  }
 
 };
 

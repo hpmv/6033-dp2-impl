@@ -3,7 +3,7 @@ var events = require('events');
 var DDR_PORT = 48342;
 var JsonLineProtocol = require('json-line-protocol').JsonLineProtocol;
 
-var Communication = function () {
+var Communication = function (serverPort) {
   var instance = this;
   this._master = null;
   this._slaves = [];
@@ -48,13 +48,17 @@ var Communication = function () {
     this._master._comm_ready = true;
   };
 
+  this.ready = function(conn) {
+    conn._comm_ready = true;
+  };
+
   this._server = net.createServer(function (conn) {
     new_slave(conn);
   });
   this.init = function () {
-    this._server.listen(DDR_PORT);
+    this._server.listen(serverPort);
   };
-  this.connect = function (target) {
+  this.connect = function (target, port) {
     if (this._master != null) return false;
     var conn = this._master = new net.Socket();
 
@@ -63,7 +67,7 @@ var Communication = function () {
       instance._master = null;
       instance.emit('lost_master', conn);
     });
-    conn.connect(DDR_PORT, target, function () {
+    conn.connect(port, target, function () {
       master_connected(conn);
     });
     return true;
@@ -89,7 +93,7 @@ var Communication = function () {
   this.all_connections = function() {
     var list = this.slaves();
     var master = this.master();
-    if(master) list.append(master);
+    if(master) list.push(master);
     return list;
   };
 
@@ -99,7 +103,7 @@ var Communication = function () {
 Communication.prototype = new events.EventEmitter();
 
 
-(function test(){
+/*(function test(){
   var com1 = new Communication(1234);
   var com2 = new Communication(2345);
   var com3 = new Communication(3456);
@@ -123,4 +127,6 @@ Communication.prototype = new events.EventEmitter();
   com2.connect('127.0.0.1');
   com3.connect('127.0.0.1');
 
-})();
+})();*/
+
+module.exports = exports = Communication;

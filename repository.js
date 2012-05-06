@@ -27,7 +27,7 @@ var Repository = function() { //TODO: add precondition checks.
     return this.color + '/' + _revNum++;
   };
   this.create_repository = function() {
-    var rev = this.genRevision();
+    var rev = "root";
     this.history.addRevision(rev);
     this.currentDocument = new Document();
     this.HEAD = rev;
@@ -70,11 +70,12 @@ var Repository = function() { //TODO: add precondition checks.
     this.history.removeRevision(mergeResult.rev);
     this.history.removeEdge(mergeResult.oldHEAD, mergeResult.rev);
   };
-  this.receiveMerge = function(mergeResult, senderColor) {
+  this.receiveMerge = function(mergeResult) {
     if(this.HEAD == mergeResult.otherRev) {
       this.history.addRevision(mergeResult.rev);
-      this.history.addEdge(mergeResult.oldHEAD, mergeResult.rev, mergeResult.e1, senderColor);
+      this.history.addEdge(mergeResult.oldHEAD, mergeResult.rev, mergeResult.e1, mergeResult.myColor);
       this.history.addEdge(mergeResult.otherRev, mergeResult.rev, mergeResult.e2, this.color);
+      this.currentDocument.apply(mergeResult.e2);
       this.HEAD = mergeResult.rev;
       return true;
     } else {
@@ -90,6 +91,17 @@ var Repository = function() { //TODO: add precondition checks.
       this.HEAD = partnerHEAD;
     }//else do nothing. Either we're ahead, or we are on a different direction.
   };
+  this.synchronize = function(history, color, head) {
+    var revs = history.revisions;
+    revs.forEach(function(rev) {
+      this.history.addRevision(rev);
+    }, this);
+    var edges = history.edges;
+    edges.forEach(function(edge) {
+      this.history.addEdge(edge.parentRev, edge.childRev, edge.data, edge.color);
+    }, this);
+    this.advanceHead(head);
+  }
 };
 
 module.exports = exports = Repository;
