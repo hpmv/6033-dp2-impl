@@ -1,3 +1,4 @@
+var EventEmitter= require('events').EventEmitter;
 var Document = function () {
   var instance = this;
   this.text = '';
@@ -20,6 +21,8 @@ var Document = function () {
         instance.text = instance.text.substr(0, b) + instance.text.substr(e, t - e) + instance.text.substr(b, e - b) + instance.text.substr(t);
       }
     });
+    this.emit('changed');
   }
 };
+Document.prototype = new EventEmitter();
 module.exports = exports = Document;

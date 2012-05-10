@@ -96,7 +96,16 @@ var Communication = function (serverPort) {
     if(master) list.push(master);
     return list;
   };
-
+  this.disconnect_all = function() {
+    if(this._master!=null) {
+      this._master.end();
+      this._master=null;
+    }
+    this._slaves.forEach(function(slave) {
+      slave.end();
+    });
+    this._slaves = [];
+  };
 
 };
 
