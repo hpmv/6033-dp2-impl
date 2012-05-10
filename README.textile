@@ -1,0 +1,34 @@
+This repository contains a partial implementation of my group's 6.033 Design Project 2.
+
+The code is written in NodeJS.
+
+h4. What is Implemented
+
+* Operational Transformation (edit_seq.js) on INSERT, DELETE, MOVE. The runtime is O(|a||b|) as described in paper.
+* Repository operations such as add revision, head advancement, merge, synchronize. (repository.js)
+* Networking transmissions. (comm.js, repo_comm.js)
+
+h4. What is Not Implemented
+
+* Two-phase commit.
+* Editor queuing during online editing (current implementation just ignores the problem).
+* The diff-merge merging strategy. Current implementation only uses OT.
+* Dynamic group membership (since two-phase commit isn't implemented anyway).
+* User conflict resolution.
+
+h4. What is not tested
+
+* Online editing with more than two users.
+* Other stuff are generally poorly tested.
+
+h2. The CLI Client
+
+The implementation includes a CLI client in cli_client.js. The client supports the following commands:
+
+* connect &lt;ip_address&gt; &lt;port&gt; : connects to the specified address and port.
+* insert &lt;pos&gt; &lt;text&gt; : inserts text at specified position.
+* delete &lt;frompos&gt; &lt;topos&gt; : deletes text from frompos to topos.
+* move &lt;frompos&gt; &lt;topos&gt; &lt;targetpos&gt; : moves text from frompos to topos to target pos.
+* disconnect : disconnects all neighbouring connections.
+
+Whenever local document is changed, the console prints the updated document.
